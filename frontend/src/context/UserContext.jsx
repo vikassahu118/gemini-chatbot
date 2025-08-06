@@ -82,7 +82,7 @@ export const UserProvider = ({ children }) => {
   }
 
   // Logout handler
-  const logoutHandler = (navigate) => {
+  const logoutHandler = () => {
     localStorage.removeItem("token");
     toast.success("Logged out");
     setIsAuth(false);
