@@ -7,7 +7,7 @@ const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
   const [btnLoading, setBtnLoading] = useState(false);
-  const [user, setUser] = useState([]);
+  const [user, setUser] = useState(null);
   const [isAuth, setIsAuth] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -59,7 +59,7 @@ export const UserProvider = ({ children }) => {
     const token = localStorage.getItem("token");
 
     if (!token) {
-      setIsAuth(false);
+      setUser(null);
       setLoading(false);
       return;
     }
@@ -75,7 +75,9 @@ export const UserProvider = ({ children }) => {
       setUser(data);
     } catch (error) {
       console.error("Fetch user failed:", error?.response?.data || error.message);
+      localStorage.removeItem("token");
       setIsAuth(false);
+      setUser(null);
     } finally {
       setLoading(false);
     }
@@ -86,7 +88,7 @@ export const UserProvider = ({ children }) => {
     localStorage.removeItem("token");
     toast.success("Logged out");
     setIsAuth(false);
-    setUser([]);
+    setUser(null);
     navigate("/login");
   };
 
