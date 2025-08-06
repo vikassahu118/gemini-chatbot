@@ -2,6 +2,7 @@ import axios from "axios";
 import { createContext, useContext, useEffect, useState } from "react";
 import { server } from "../main";
 import toast from "react-hot-toast";
+import { UserData } from "./UserContext";
 
 const ChatContext = createContext();
 
@@ -9,156 +10,165 @@ export const ChatProvider = ({ children }) => {
   const [messages, setMessages] = useState([]);
   const [prompt, setPrompt] = useState("");
   const [newRequestLoading, setNewRequestLoading] = useState(false);
+  const [chats, setChats] = useState([]);
+  const [selected, setSelected] = useState(null);
+  const [createLod, setCreateLod] = useState(false);
+  const [loading, setLoading] = useState(false);
 
+  const { isAuth } = UserData(); // ✅ get auth status from context
+
+  // 🚀 Fetch Gemini AI Response
   async function fetchResponse() {
-    if (prompt === "") return alert("Write prompt");
+    if (!prompt) return alert("Write prompt");
+
     setNewRequestLoading(true);
+    const inputPrompt = prompt;
     setPrompt("");
+
     try {
-      const response = await axios({
-       url: "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyBr_2Dj_bhhxTsoIDJ-uPGHMeRf3Y64-hQ",
-        method: "post",
-        data: {
-          contents: [{ parts: [{ text: prompt }] }],
-        },
-      });
+      const response = await axios.post(
+        "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyBr_2Dj_bhhxTsoIDJ-uPGHMeRf3Y64-hQ",
+        {
+          contents: [{ parts: [{ text: inputPrompt }] }],
+        }
+      );
+
+      const answer =
+        response.data?.candidates?.[0]?.content?.parts?.[0]?.text || "No response";
 
       const message = {
-        question: prompt,
-        answer:
-          response["data"]["candidates"][0]["content"]["parts"][0]["text"],
+        question: inputPrompt,
+        answer,
       };
 
       setMessages((prev) => [...prev, message]);
       setNewRequestLoading(false);
 
-      const { data } = await axios.post(
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      await axios.post(
         `${server}/api/chat/${selected}`,
         {
-          question: prompt,
-          answer:
-            response["data"]["candidates"][0]["content"]["parts"][0]["text"],
+          question: inputPrompt,
+          answer,
         },
         {
           headers: {
-  Authorization: `Bearer ${localStorage.getItem("token")}`,
-},
-
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
     } catch (error) {
-      alert("someting went wrong");
-      console.log(error);
+      console.error("❌ fetchResponse error:", error);
+      alert("Something went wrong");
       setNewRequestLoading(false);
     }
   }
 
-  const [chats, setChats] = useState([]);
-
-  const [selected, setSelected] = useState(null);
-
- 
- 
- 
+  // 📩 Fetch All Chats
   async function fetchChats() {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.warn("Token not found for fetching chats");
+      return;
+    }
+
     try {
       const { data } = await axios.get(`${server}/api/chat/all`, {
         headers: {
-  Authorization: `Bearer ${localStorage.getItem("token")}`,
-},
-
+          Authorization: `Bearer ${token}`,
+        },
       });
 
       setChats(data);
-if (data.length > 0) {
-  setSelected(data[0]._id);
-} else {
-  setSelected(null); // Clear selected if no chats
-}
+      setSelected(data.length > 0 ? data[0]._id : null);
     } catch (error) {
-      console.log(error);
+      console.error("❌ Fetch Chats Error:", error.response?.data || error.message);
     }
   }
 
-  const [createLod, setCreateLod] = useState(false);
-
- 
- 
- 
+  // ➕ Create New Chat
   async function createChat() {
     setCreateLod(true);
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
     try {
-      const { data } = await axios.post(
+      await axios.post(
         `${server}/api/chat/new`,
         {},
         {
-         headers: {
-  Authorization: `Bearer ${localStorage.getItem("token")}`,
-},
-
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
 
       fetchChats();
       setCreateLod(false);
     } catch (error) {
-      toast.error("some went wrong");
+      toast.error("Something went wrong");
       setCreateLod(false);
     }
   }
 
-  const [loading, setLoading] = useState(false);
-
-  
-  
-  
+  // 📥 Fetch Messages by Chat ID
   async function fetchMessages() {
- if (!selected) return; // 🔒 prevent invalid request
-
+    if (!selected) return;
     setLoading(true);
+
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
     try {
       const { data } = await axios.get(`${server}/api/chat/${selected}`, {
         headers: {
-  Authorization: `Bearer ${localStorage.getItem("token")}`,
-},
-
+          Authorization: `Bearer ${token}`,
+        },
       });
+
       setMessages(data);
       setLoading(false);
     } catch (error) {
-      console.log(error);
+      console.error("❌ Fetch Messages Error:", error);
       setLoading(false);
     }
   }
 
-  
-  
-  
+  // ❌ Delete Chat
   async function deleteChat(id) {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
     try {
       const { data } = await axios.delete(`${server}/api/chat/${id}`, {
         headers: {
-  Authorization: `Bearer ${localStorage.getItem("token")}`,
-},
-
+          Authorization: `Bearer ${token}`,
+        },
       });
+
       toast.success(data.message);
       fetchChats();
       window.location.reload();
     } catch (error) {
-      console.log(error);
-      alert("something went wrong");
+      console.error("❌ Delete Chat Error:", error);
+      alert("Something went wrong");
     }
   }
 
+  // 🟡 Fetch chats only after login
   useEffect(() => {
-    fetchChats();
-  }, []);
+    if (isAuth && localStorage.getItem("token")) {
+      fetchChats();
+    }
+  }, [isAuth]);
 
+  // 🔁 Fetch messages when selected chat changes
   useEffect(() => {
-    if (selected)
-    fetchMessages();
+    if (selected) fetchMessages();
   }, [selected]);
+
   return (
     <ChatContext.Provider
       value={{
