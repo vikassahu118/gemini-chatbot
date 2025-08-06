@@ -9,11 +9,16 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Verify from "./pages/Verify";
 import NotFound from "./pages/NotFound";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 export const router = createBrowserRouter([
     {
         path: "/",
-        element: <Home />,
+        element: (
+            <ProtectedRoute>
+                <Home />
+            </ProtectedRoute>
+        ),
     },
     {
         path: "/login",
