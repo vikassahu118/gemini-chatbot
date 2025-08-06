@@ -2,8 +2,10 @@ import { createContext, useContext, useEffect, useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import axios from "axios";
 import { server } from "../main";
+import { useNavigate } from "react-router-dom";
 
 const UserContext = createContext();
+const navigate = useNavigate
 
 export const UserProvider = ({ children }) => {
   const [btnLoading, setBtnLoading] = useState(false);
