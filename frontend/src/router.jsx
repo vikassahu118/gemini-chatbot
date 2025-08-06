@@ -8,6 +8,7 @@ import {
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Verify from "./pages/Verify";
+import NotFound from "./pages/NotFound";
 
 export const router = createBrowserRouter([
     {
@@ -22,7 +23,10 @@ export const router = createBrowserRouter([
         path: "/verify",
         element: <Verify />,
     },
-
+    {
+        path:"*",
+        element:<NotFound />,
+    }
 ],
   {
     future: {
