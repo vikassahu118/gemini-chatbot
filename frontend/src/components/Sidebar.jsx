@@ -74,7 +74,11 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       <div className="absolute bottom-0 mb-6 w-full">
         <button
           className="bg-red-600 text-white text-xl px-3 py-2 rounded-md hover:bg-red-700"
-          onClick={() => logoutHandler(navigate)}
+          onClick={() => {
+            if (confirm("Are you sure you want to logout?")) {
+            logoutHandler(navigate);
+          }
+        }}
         >
           Logout
         </button>
