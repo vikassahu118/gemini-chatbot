@@ -89,11 +89,12 @@ const Home = () => {
                         <FaRobot className="text-white text-xl" />
                       </div>
                       <div className="backdrop-blur-lg bg-white/10 p-4 rounded-2xl rounded-tl-md border border-white/20 shadow-lg max-w-[80%]">
-                        <div 
-                          className="prose prose-invert text-white max-w-none"
+                        <article
+                          className="prose prose-invert max-w-none [&>pre]:bg-gray-900 [&>pre]:text-white [&>code]:text-pink-400"
                           dangerouslySetInnerHTML={{ __html: e.answer }}
                         />
                       </div>
+
                     </div>
                   </div>
                 ))
@@ -135,7 +136,7 @@ const Home = () => {
                 onChange={(e) => setPrompt(e.target.value)}
                 required
               />
-              <button 
+              <button
                 type="submit"
                 className="ml-2 p-3 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 rounded-xl text-white transition-all duration-200 hover:scale-105 shadow-lg"
               >
