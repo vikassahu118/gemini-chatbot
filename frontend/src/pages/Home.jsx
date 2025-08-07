@@ -40,6 +40,7 @@ const Home = () => {
       });
     }
   }, [messages]);
+
   return (
     <div className="flex h-screen bg-gray-900 text-white">
       <Sidebar isOpen={isOpen} toggleSidebar={toggleSidebar} />
@@ -90,9 +91,8 @@ const Home = () => {
         </div>
       </div>
 
-      {chats && chats.length === 0 ? (
-        ""
-      ) : (
+      {/* Show Prompt Box ONLY when chats exist and sidebar is closed */}
+      {(chats && chats.length > 0 && !isOpen) && (
         <div className="fixed bottom-0 right-0 left-auto p-4 bg-gray-900 w-full md:w-[75%]">
           <form
             onSubmit={submitHandler}
@@ -101,7 +101,7 @@ const Home = () => {
             <input
               className="flex-grow p-4 bg-gray-700 rounded-l text-white outline-none"
               type="text"
-              placeholder="Enter a promp here"
+              placeholder="Enter a prompt here"
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
               required
