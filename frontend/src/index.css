@@ -2,9 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  @apply bg-slate-900;
-}
+
 
 .thin-scrollbar {
   scrollbar-width: thin;
