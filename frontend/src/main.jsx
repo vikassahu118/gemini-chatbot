@@ -6,7 +6,7 @@ import { ChatProvider } from "./context/ChatContext.jsx";
 import { RouterProvider } from "react-router-dom";
 import { router } from "./router.jsx";
 
-export const server = "http://localhost:5000";
+export const server = "https://gemini-chatbot-vuog.onrender.com";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
