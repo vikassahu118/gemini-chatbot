@@ -86,7 +86,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                     {e.latestMessage.slice(0, 32)}...
                   </span>
                   <button
-                    className="bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-white p-2 rounded-lg hover:scale-105 transform transition-all duration-200 shadow-lg opacity-0 group-hover:opacity-100"
+                    className="bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-white p-2 rounded-lg hover:scale-105 transform transition-all duration-200 shadow-lg opacity-100 md:opacity-0 group-hover:opacity-100"
                     onClick={(event) => deleteChatHandler(e._id, event)}
                   >
                     <MdDelete className="text-sm" />
