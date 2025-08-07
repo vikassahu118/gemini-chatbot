@@ -8,6 +8,7 @@ import { FaRobot } from "react-icons/fa";
 import { LoadingBig, LoadingSmall } from "../components/Loading";
 import { IoMdSend } from "react-icons/io";
 
+
 const Home = () => {
   const [isOpen, setIsOpen] = useState(false);
 
