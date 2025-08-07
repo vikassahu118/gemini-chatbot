@@ -8,7 +8,6 @@ import { FaRobot } from "react-icons/fa";
 import { LoadingBig, LoadingSmall } from "../components/Loading";
 import { IoMdSend } from "react-icons/io";
 
-
 const Home = () => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -91,7 +90,7 @@ const Home = () => {
                       </div>
                       <div className="backdrop-blur-lg bg-white/10 p-4 rounded-2xl rounded-tl-md border border-white/20 shadow-lg max-w-[80%]">
                         <div 
-                          className="text-white prose prose-invert max-w-none"
+                          className="prose prose-invert text-white max-w-none"
                           dangerouslySetInnerHTML={{ __html: e.answer }}
                         />
                       </div>

@@ -3,6 +3,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { server } from "../main";
 import toast from "react-hot-toast";
 import { UserData } from "./UserContext";
+import { marked } from "marked";
 
 const ChatContext = createContext();
 
@@ -36,9 +37,11 @@ export const ChatProvider = ({ children }) => {
       const answer =
         response.data?.candidates?.[0]?.content?.parts?.[0]?.text || "No response";
 
+        const formattedAnswer = marked.parse(answer);
+
       const message = {
         question: inputPrompt,
-        answer,
+        answer: formattedAnswer,
       };
 
       setMessages((prev) => [...prev, message]);
