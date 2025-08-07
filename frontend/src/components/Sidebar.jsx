@@ -11,7 +11,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
   const { logoutHandler } = UserData();
 
   const deleteChatHandler = (id, e) => {
-    e.stopPropagation();
+    e.stopPropagation(); // prevent parent click
     if (confirm("Are you sure you want to delete this chat?")) {
       deleteChat(id);
     }
@@ -24,42 +24,43 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
 
   return (
     <div
-      className={`fixed inset-0 bg-gray-800 p-4 transition-transform transform flex flex-col justify-between md:relative md:translate-x-0 md:w-1/4 md:block ${
+      className={`fixed inset-0 bg-gray-800 p-4 transition-transform transform md:relative md:translate-x-0 md:w-1/4 md:block ${
         isOpen ? "translate-x-0" : "-translate-x-full"
       }`}
     >
-      <div className="overflow-y-auto flex-1">
-        {/* Close button for mobile */}
+      {/* Close button (mobile only) */}
+      <button
+        className="md:hidden p-2 mb-4 bg-gray-700 rounded text-2xl"
+        onClick={toggleSidebar}
+      >
+        <IoIosCloseCircle />
+      </button>
+
+      {/* Title */}
+      <div className="text-2xl font-semibold mb-6">ChatBot</div>
+
+      {/* New Chat Button */}
+      <div className="mb-4">
         <button
-          className="md:hidden p-2 mb-4 bg-gray-700 rounded text-2xl"
-          onClick={toggleSidebar}
+          onClick={createChat}
+          className="w-full py-2 bg-gray-700 hover:bg-gray-600 rounded"
         >
-          <IoIosCloseCircle />
+          {createLod ? <LoadingSpinner /> : "New Chat +"}
         </button>
+      </div>
 
-        <div className="text-2xl font-semibold mb-6">ChatBot</div>
-
-        <div className="mb-4">
-          <button
-            onClick={createChat}
-            className="w-full py-2 bg-gray-700 hover:bg-gray-600 rounded"
-          >
-            {createLod ? <LoadingSpinner /> : "New Chat +"}
-          </button>
-        </div>
-
+      {/* Chat List */}
+      <div>
         <p className="text-sm text-gray-400 mb-2">Recent</p>
-        <div className="space-y-2">
+        <div className="max-h-[500px] overflow-y-auto mb-[72px] thin-scrollbar">
           {chats && chats.length > 0 ? (
             chats.map((e) => (
               <div
                 key={e._id}
-                className="w-full text-left py-2 px-2 bg-gray-700 hover:bg-gray-600 rounded flex justify-between items-center cursor-pointer"
+                className="w-full text-left py-2 px-2 bg-gray-700 hover:bg-gray-600 rounded mt-2 flex justify-between items-center cursor-pointer"
                 onClick={() => clickEvent(e._id)}
               >
-                <span className="truncate max-w-[200px]">
-                  {e.latestMessage.slice(0, 38)}...
-                </span>
+                <span>{e.latestMessage.slice(0, 38)}...</span>
                 <span
                   className="bg-red-600 text-white text-xl px-3 py-2 rounded-md hover:bg-red-700"
                   onClick={(event) => deleteChatHandler(e._id, event)}
@@ -74,8 +75,8 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         </div>
       </div>
 
-      {/* Logout button (always at bottom) */}
-      <div className="mt-4">
+      {/* Logout Button (Always at bottom) */}
+      <div className="absolute bottom-0 left-0 w-full px-4 pb-4">
         <button
           className="bg-red-600 text-white text-xl px-3 py-2 rounded-md hover:bg-red-700 w-full"
           onClick={() => {
