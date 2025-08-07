@@ -1,5 +1,10 @@
 import { Chat } from "../models/Chat.js";
 import { Conversation } from "../models/Conversation.js";
+import { marked } from "marked";
+import { GoogleGenerativeAI } from "@google/generative-ai";
+
+// Initialize Gemini
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 export const createChat = async (req, res) => {
   try {
@@ -40,15 +45,27 @@ export const addConversation = async (req, res) => {
         message: "No chat with this id",
       });
 
+    const { question } = req.body;
+
+    // 🧠 Get Gemini response
+    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    const result = await model.generateContent(question);
+    const response = await result.response;
+    const answerMarkdown = response.text();
+
+    // 📄 Convert Markdown to HTML
+    const answerHtml = marked.parse(answerMarkdown);
+
+    // 💬 Store conversation
     const conversation = await Conversation.create({
       chat: chat._id,
-      question: req.body.question,
-      answer: req.body.answer,
+      question,
+      answer: answerHtml, // Save HTML
     });
 
     const updatedChat = await Chat.findByIdAndUpdate(
       req.params.id,
-      { latestMessage: req.body.question },
+      { latestMessage: question },
       { new: true }
     );
 
