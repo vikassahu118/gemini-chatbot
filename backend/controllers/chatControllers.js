@@ -6,6 +6,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 // Initialize Gemini
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
+// ✅ Create a new chat
 export const createChat = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -22,6 +23,7 @@ export const createChat = async (req, res) => {
   }
 };
 
+// ✅ Get all chats for user
 export const getAllChats = async (req, res) => {
   try {
     const chats = await Chat.find({ user: req.user._id }).sort({
@@ -36,6 +38,7 @@ export const getAllChats = async (req, res) => {
   }
 };
 
+// ✅ Add conversation with streaming + markdown to HTML
 export const addConversation = async (req, res) => {
   try {
     const chat = await Chat.findById(req.params.id);
@@ -47,11 +50,15 @@ export const addConversation = async (req, res) => {
 
     const { question } = req.body;
 
-    // 🧠 Get Gemini response
+    // 🧠 Gemini Streaming Response
     const model = genAI.getGenerativeModel({ model: "gemini-pro" });
-    const result = await model.generateContent(question);
-    const response = await result.response;
-    const answerMarkdown = response.text();
+    const result = await model.generateContentStream([question]);
+
+    let answerMarkdown = "";
+
+    for await (const chunk of result.stream) {
+      answerMarkdown += chunk.text();
+    }
 
     // 📄 Convert Markdown to HTML
     const answerHtml = marked.parse(answerMarkdown);
@@ -69,7 +76,11 @@ export const addConversation = async (req, res) => {
       { new: true }
     );
 
-    res.json({
+    // 📤 Send to frontend
+    res.status(200).json({
+      success: true,
+      question,
+      answer: answerHtml,
       conversation,
       updatedChat,
     });
@@ -80,6 +91,7 @@ export const addConversation = async (req, res) => {
   }
 };
 
+// ✅ Get all conversations from a chat
 export const getConversation = async (req, res) => {
   try {
     const conversation = await Conversation.find({ chat: req.params.id });
@@ -97,6 +109,7 @@ export const getConversation = async (req, res) => {
   }
 };
 
+// ✅ Delete a chat
 export const deleteChat = async (req, res) => {
   try {
     const chat = await Chat.findById(req.params.id);
