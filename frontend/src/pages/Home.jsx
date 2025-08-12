@@ -60,7 +60,7 @@ const Home = () => {
           <GiHamburgerMenu />
         </button>
 
-        <div className="flex-1 p-6 mb-20 md:mb-0">
+        <div className="flex-1 p-6 mb-20 md:mb-1">
           <Header />
 
           {loading ? (
